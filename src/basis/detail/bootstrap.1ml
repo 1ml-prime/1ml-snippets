@@ -1,0 +1,52 @@
+Opt = {...Opt; t = opt};
+
+Sq = {type t a = (a, a)};
+
+BinOp = {type t a = a => a -> a};
+BinPr = {type t a = a => a -> Bool.t};
+
+UnOp = {type t a = a -> a};
+UnPr = {type t a = a -> Bool.t};
+
+Emb = {type t a b = {to: a -> b; from: b -> Opt.t a}};
+Iso = {type t a b = {to: a -> b; from: b -> a}};
+
+Reader = {type t s e = s -> Opt.t (type (e, s))};
+Writer = {type t s e = e => s -> s};
+
+Bounds = {type t v = {min: v; max: v}};
+
+Const = {type t v _ = v};
+Id = {type t v = v};
+Fork = {type t (type l a) (type r a) a = (l a, r a)};
+
+;;
+
+Typing = {
+  typeOf 'a (_: a) = type a;
+  domOf 'd 'c (_: d -> c) = type d;
+  codOf 'd 'c (_: d -> c) = type c;
+};
+
+...Typing;
+
+;;
+
+Fun = {
+  ...Fun;
+  flip f x y = f y x;
+  (|>) x f = f x;
+};
+
+local ...Fun in
+  flip = flip;
+  (|>) = (|>);
+end;
+
+;;
+
+type t'0 = type;
+type t'1 = type => t'0;
+type t'2 = type => t'1;
+type t'3 = type => t'2;
+type t'4 = type => t'3;

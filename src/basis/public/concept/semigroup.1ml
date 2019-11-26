@@ -1,0 +1,20 @@
+type SEMIGROUP t = {
+  concat: BinOp.t t;
+};
+
+type SEMIGROUP'0 = {
+  ...T'0;
+  ...SEMIGROUP t;
+};
+
+
+
+type MONOID t = {
+  ...SEMIGROUP t;
+  empty: t;
+};
+
+type MONOID = {
+  ...T'0;
+  ...MONOID t;
+};

@@ -1,0 +1,40 @@
+At = {type t a = Int.t -> a};
+
+type PUSH (type con a) (type cov a) = {
+  generate 'a: Int.t => At.t a   -> cov a;
+  append   'a: con a => con a    -> cov a;
+  map   'a 'b: (a -> b) => con a -> cov b;
+  reverse  'a: con a             -> cov a;
+};
+
+type PUSH'1 = {
+  type t a;
+  ...PUSH t t;
+};
+
+PushPull (Push: PUSH'1)
+         (fold: 'a =>
+                (type t a) =>
+                (on: PUSH (Fork.t Push.t t) t) =>
+                Push.t a -> t a) = let ...Push in {
+  length 'a: Push.t a -> Int.t = fold (Const.t Int.t) {
+    generate n _ = n;
+    append (_, nL) (_, nR) = nL + nR;
+    map _ (_, n) = n;
+    reverse (_, n) = n;
+  };
+
+  at 'a: Push.t a -> At.t a = fold At.t {
+    generate n at = at;
+    append (ls, lat) (_, rat) = let ln = length ls in
+      fun i => if i < ln then lat i else rat (i - ln);
+    map xy (_, xat) = fun i => xy (xat i);
+    reverse (xs, xat) = let xnm1 = length xs - 1 in
+      fun i => xat (xnm1 - i);
+  };
+
+  foo =
+    Push.generate 10 id
+    |> Push.map (fun x => (x, x))
+    |> Push.reverse;
+};

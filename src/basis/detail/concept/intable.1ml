@@ -1,0 +1,7 @@
+Intable = {
+  fromCore 't (Core: INTABLE t) : INTABLE'0 = {
+    t = t;
+    ...Core;
+    isoInt = {to = toInt; from = fromInt};
+  };
+};

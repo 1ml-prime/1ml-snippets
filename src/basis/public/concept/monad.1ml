@@ -1,0 +1,9 @@
+type MONAD (t: t'1) = {
+  return 'a: a => t a;
+  (>>=) 'a 'b: t a => (a -> t b) -> t b;
+};
+
+type MONAD'1 = {
+  ...T'1;
+  ...MONAD t;
+};

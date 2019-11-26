@@ -1,0 +1,9 @@
+Reader = {
+  ...Reader;
+
+  return x : t _ _ = fun s => some (x, s);
+  (>>=) xR xyR : t _ _ = fun s =>
+    caseopt (xR s)
+      (fun () => none)
+      (fun (x, s) => xyR x s);
+};

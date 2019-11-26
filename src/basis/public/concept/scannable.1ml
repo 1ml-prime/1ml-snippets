@@ -1,0 +1,8 @@
+type SCANNABLE t = {
+  scan 's: Reader.t s Char.t => Reader.t s t;
+};
+
+type SCANNABLE'0 t = {
+  ...T'0;
+  ...SCANNABLE t;
+};

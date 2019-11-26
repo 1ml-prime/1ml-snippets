@@ -1,0 +1,4 @@
+type CASED t = {
+  toLower: UnOp.t t;
+  toUpper: UnOp.t t;
+};

@@ -1,0 +1,5 @@
+type T'0 = {type t};
+type T'1 = {type t v1};
+type T'2 = {type t v1 v2};
+type T'3 = {type t v1 v2 v3};
+type T'4 = {type t v1 v2 v3 v4};

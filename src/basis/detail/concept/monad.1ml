@@ -1,0 +1,11 @@
+Monad (M: MONAD'1) : {
+  ...MONAD'1;
+  map 'a 'b: (a -> b) => t a -> t b;
+  (>=>) 'a 'b 'c: (a -> t b) => (b -> t c) -> a -> t c;
+  (<=<) 'a 'b 'c: (b -> t c) => (a -> t b) -> a -> t c;
+} = {
+  ...M;
+  map xy xM = xM >>= (xy >> return);
+  (>=>) abM bcM = fun a => abM a >>= bcM;
+  (<=<) bcM abM = fun a => abM a >>= bcM;
+};

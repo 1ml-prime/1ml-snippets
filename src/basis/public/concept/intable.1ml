@@ -1,0 +1,10 @@
+type INTABLE t = {
+  fromInt: Int.t -> t;
+  toInt: t -> Int.t;
+};
+
+type INTABLE'0 = {
+  ...T'0;
+  ...INTABLE t;
+  isoInt: Iso.t t Int.t;
+};

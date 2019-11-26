@@ -1,0 +1,144 @@
+type TIV (type con a) (type cov a) = {
+  bool : cov bool;
+  char : cov char;
+  int  : cov int;
+  text : cov text;
+  unit : cov (type ());
+
+  list 'a : con a -> cov (list a);
+  opt  'a : con a -> cov (opt  a);
+
+  alt   'a 'b : con a => con b -> cov (alt a b);
+  (-->) 'a 'b : con a => con b -> cov (type a -> b);
+  pair  'a 'b : con a => con b -> cov (type (a, b));
+
+  iso 'a 'b : Iso.t a b => con b -> cov a;
+};
+
+type REP = {...T'1; ...TIV t t};
+
+...{
+  Rep = {
+    type T a = (r: REP) -> r.t a;
+    type t a = wrap T a;
+    wr 'a (r: T a) = wrap r: t _;
+    un r = unwrap r: t _;
+
+    local
+      nullary 'a (g: (r: REP) -> r.t a) = wr (fun (r: REP) => g r);
+    in
+      bool = nullary (fun (r: REP) => r.bool);
+      char = nullary (fun (r: REP) => r.char);
+      int  = nullary (fun (r: REP) => r.int);
+      text = nullary (fun (r: REP) => r.text);
+      unit = nullary (fun (r: REP) => r.unit);
+    end;
+
+    local
+      unary 'a 'b (g: (r: REP) -> r.t a -> r.t b) a =
+        wr (fun (r: REP) => g r (un a r));
+    in
+      list = unary (fun (r: REP) => r.list);
+      opt  = unary (fun (r: REP) => r.opt);
+    end;
+
+    local
+      binary 'a 'b 'c (g: (r: REP) -> r.t a -> r.t b -> r.t c) a b =
+        wr (fun (r: REP) => g r (un a r) (un b r));
+    in
+      alt   = binary (fun (r: REP) => r.alt);
+      pair  = binary (fun (r: REP) => r.pair);
+      (-->) = binary (fun (r: REP) => r.-->);
+    end;
+
+    iso 'a 'b (aIb: Iso.t a b) b = wr (fun (r: REP) => r.iso aIb (un b r));
+  };
+
+  type TIV (type t a) = TIV (Fork.t Rep.t t) t;
+
+  tiv 'a (type t a) (on: TIV t) (aRep: Rep.t a) =
+    (Rep.un aRep {
+      t = Fork.t Rep.t t;
+
+      bool = (Rep.bool, on.bool);
+      char = (Rep.char, on.char);
+      int  = (Rep.int,  on.int);
+      text = (Rep.text, on.text);
+      unit = (Rep.unit, on.unit);
+
+      list 'a (a: t a) = (Rep.list a.1, on.list a);
+      opt  'a (a: t a) = (Rep.opt  a.1, on.opt  a);
+
+      alt   'a 'b (a: t a) (b: t b) = (Rep.alt  a.1 b.1, on.alt  a b);
+      (-->) 'a 'b (a: t a) (b: t b) = (Rep.-->  a.1 b.1, on.-->  a b);
+      pair  'a 'b (a: t a) (b: t b) = (Rep.pair a.1 b.1, on.pair a b);
+
+      iso 'a 'b (aIb: Iso.t a b) (b: t b) = (Rep.iso aIb b.1, on.iso aIb b);
+    }).2;
+} :> {
+  Rep: REP;
+
+  type TIV (type t a) = TIV (Fork.t Rep.t t) t;
+
+  tiv 'a: (type t a) => (on: TIV t) => Rep.t a -> t a;
+};
+
+tivDefaults (type t a) (default: 'a => t a) : TIV t = {
+  bool = default;
+  char = default;
+  int  = default;
+  unit = default;
+  text = default;
+
+  local
+    unary _ = default;
+  in
+    list = unary;
+    opt  = unary;
+  end;
+
+  local
+    binary _ _ = default;
+  in
+    alt   = binary;
+    (-->) = binary;
+    pair  = binary;
+  end;
+
+  iso _ _ = default;
+};
+
+;; -----------------------------------------------------------------------------
+
+toText = let type t a = a -> Text.t in tiv t {
+  ...tivDefaults t (fun _ => "<unimplemented>");
+
+  bool b = if b then "true" else "false";
+  unit () = "()";
+  text t = "\"" ++ t ++ "\"";
+
+  opt (_, aT) aO =
+    caseopt aO
+      (fun () => "none")
+      (fun a => "(some " ++ aT a ++ ")");
+
+  alt (_, aT) (_, bT) ab =
+    casealt ab
+      (fun a => "(left " ++ aT a ++ ")")
+      (fun b => "(right " ++ bT b ++ ")");
+
+  pair (_, aT) (_, bT) (a, b) = "(" ++ aT a ++ ", " ++ bT b ++ ")";
+
+  iso (ab: Iso.t _ _) (_, bT) a = bT (ab.to a);
+};
+
+println rep x = print (toText rep x ++ "\n");
+
+local
+  ...Rep;
+in
+  do println (int) 101;
+  do println (pair bool text) (true, "that");
+  do println (opt bool) (some false);
+  do println (iso {to i = i <> 0; from b = if b then 1 else 0} bool) 1;
+end;

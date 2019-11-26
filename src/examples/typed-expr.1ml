@@ -1,0 +1,61 @@
+type EXPR = {
+  type t a;
+  Val 'x       : x                                      -> t x;
+  Un  'x 'y    : (x -> y) => t x                        -> t y;
+  Bin 'x 'y 'z : (x -> y -> z) => t x => t y            -> t z;
+  If  'x       : t Bool.t => (() -> t x) => (() -> t x) -> t x;
+  App 'x 'y    : t (type x -> y) => t x                 -> t y;
+  Lam 'x 'y    : (x -> t y)                             -> t (type x -> y);
+  Fix 'x 'y    : t (type (x -> y) -> x -> y)            -> t (type x -> y);
+};
+
+TryExpr (Expr: EXPR) (fold: 'a => (on: EXPR) => Expr.t a -> on.t a) = let
+  ...Expr;
+  (==) = Bin (==);
+  (*) = Bin (*);
+  (-) = Bin (-);
+in {
+  Fact = Fix (Lam (fun f => Lam (fun x =>
+                If (Val x == Val 0)
+                   (fun () => Val 1)
+                   (fun () => Val x * App (Val f) (Val x - Val 1)))));
+
+  eval = fold {
+    type t a = a;
+    Val x = x;
+    Un fn x = fn x;
+    Bin fn x y = fn x y;
+    If b c a = (if b then c else a) ();
+    App fn x = fn x;
+    Lam fn = fn;
+    Fix e = rec (e': _) => fun x => e e' x;
+  };
+
+  do Int.print (eval (App Fact (Val 5)));
+};
+
+...{
+  Expr = {
+    type t a = wrap (on: EXPR) -> on.t a;
+    wr 'a (fn: (on: EXPR) -> on.t a) = wrap fn: t _;
+    un e = unwrap e: t _;
+    Val x = wr (fun (on: EXPR) => on.Val x);
+    Un (fn: _ -> _) x = wr (fun (on: EXPR) => on.Un fn (un x on));
+    Bin (fn: _ -> _ -> _) x y = wr (fun (on: EXPR) =>
+      on.Bin fn (un x on) (un y on));
+    If b (c: () -> t _) (a: () -> t _) = wr (fun (on: EXPR) =>
+      on.If (un b on) (fun () => un (c ()) on) (fun () => un (a ()) on));
+    App (fn: t (type _ -> _)) x = wr (fun (on: EXPR) =>
+      on.App (un fn on) (un x on));
+    Lam (fn: _ -> t _) = wr (fun (on: EXPR) => on.Lam (fun x => un (fn x) on));
+    Fix (e: t (type (_ -> _) -> _)) = wr (fun (on: EXPR) => on.Fix (un e on));
+  };
+
+  fold 'a (on: EXPR) (t: Expr.t a) = (unwrap t: Expr.t _) on;
+} :> {
+  Expr: EXPR;
+
+  fold 'a: (on: EXPR) => Expr.t a -> on.t a;
+};
+
+do TryExpr Expr fold;

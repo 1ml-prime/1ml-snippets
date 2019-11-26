@@ -1,0 +1,14 @@
+type CONTRACT = {
+  type t a;
+
+  assert 'a: t a -> UnOp.t a;
+
+  that 'a: UnPr.t a -> t a;
+
+  any 'a: t a;
+  none 'a: t a;
+
+  (-->) 'a 'b: t a => (a -> t b) -> t (type a -> b);
+
+  andAlso 'a: BinOp.t (t a);
+};

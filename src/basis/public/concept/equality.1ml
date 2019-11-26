@@ -1,0 +1,9 @@
+type EQUALITY t = {
+  (==): BinPr.t t;
+};
+
+type EQUALITY'0 = {
+  ...T'0;
+  ...EQUALITY t;
+  (<>): BinPr.t t;
+};

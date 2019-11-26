@@ -1,0 +1,7 @@
+Bounded = {
+  fromCore 't (Core: BOUNDED t) : BOUNDED'0 = {
+    t = t;
+    ...Core;
+    bounds = {min = minValue; max = maxValue};
+  };
+};

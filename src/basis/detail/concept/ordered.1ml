@@ -1,0 +1,19 @@
+Ordered = {
+  fromCore 't (Core: ORDERED t) : ORDERED'0 = {
+    t = t;
+
+    ...Core;
+
+    (>) l r = r < l;
+
+    (<=) l r = not (r < l);
+    (>=) l r = not (l < r);
+
+    max l r = if l < r then r else l;
+    min l r = if r < l then r else l;
+
+    inRange (r: Bounds.t _) x = not ((x < r.min) or (r.max < x));
+  };
+
+  fromLess ((<): BinPr.t _) = fromCore {(<) = (<)};
+};

@@ -1,0 +1,14 @@
+type PROFUNCTOR (t: t'2) = {
+  dimap 'a 'b 'c 'd: (a -> b) => (c -> d) => t b c -> t a d;
+};
+
+type PROFUNCTOR'2 = {
+  ...T'2;
+  ...PROFUNCTOR t;
+};
+
+type PROFUNCTOR_EXTRA (t: t'2) = {
+  ...PROFUNCTOR t;
+  lmap 'a 'b 'c: (a -> b) => t b c -> t a c;
+  rmap 'a 'b 'c: (b -> c) => t a b -> t a c;
+};

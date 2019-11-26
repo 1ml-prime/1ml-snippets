@@ -1,0 +1,35 @@
+Bool: BOOL = {
+  ...Bool;
+
+  isFalse b = b == false;
+  isTrue b = b == true;
+
+  ...{
+      notb = not;
+      andb l r = l and r;
+      orb l r = l or r;
+      xorb l r = l <> r;
+    } : BITWISE t;
+
+  ...{
+      minValue = false;
+      maxValue = true;
+    } : BOUNDED t;
+
+  ...{
+      toInt b = if b then 1 else 0;
+      fromInt i = i <> 0;
+    } : INTABLE t;
+
+  ...{(<) l r = not l and r} : ORDERED t;
+
+  ...{
+      toText b = if b then "true" else "false";
+      fromText t =
+        if t == "true" then some true
+        else (if t == "false" then some false
+        else none);
+    } : TEXTABLE t;
+
+  ...{(==) = (==)} : EQUALITY t;
+};

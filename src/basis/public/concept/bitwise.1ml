@@ -1,0 +1,11 @@
+type BITWISE t = {
+  notb: UnOp.t t;
+  andb: BinOp.t t;
+  orb: BinOp.t t;
+  xorb: BinOp.t t;
+};
+
+type BITWISE'0 = {
+  ...T'0;
+  ...BITWISE t;
+};

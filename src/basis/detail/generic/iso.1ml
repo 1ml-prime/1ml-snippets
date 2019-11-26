@@ -1,0 +1,14 @@
+Iso: ISO = {
+  ...Iso;
+
+  to = (.to);
+  from = (.from);
+
+  ...{
+    id = {to = id; from = id};
+    (<<) (l: t _ _) (r: t _ _) = {
+      to = l.to << r.to;
+      from = l.from >> r.from;
+    };
+  } : CATEGORY t;
+};

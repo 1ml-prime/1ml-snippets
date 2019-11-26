@@ -1,0 +1,7 @@
+Category = {
+  fromCore (t: t'2) (Core: CATEGORY t) : CATEGORY'2 = {
+    t = t;
+    ...Core;
+    (>>) = flip (<<);
+  };
+};

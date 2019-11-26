@@ -1,0 +1,10 @@
+type TEXTABLE t = {
+  toText: t -> Text.t;
+  fromText: Text.t -> Opt.t t;
+};
+
+type TEXTABLE'0 = {
+  ...T'0;
+  ...TEXTABLE t;
+  embText: Emb.t t Text.t;
+};

@@ -1,0 +1,10 @@
+type BOUNDED t = {
+  minValue: t;
+  maxValue: t;
+};
+
+type BOUNDED'0 = {
+  ...T'0;
+  ...BOUNDED t;
+  bounds: Bounds.t t;
+};

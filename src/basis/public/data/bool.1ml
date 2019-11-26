@@ -1,0 +1,19 @@
+type BOOL = {
+  type t = bool;
+
+  false: t;
+  true: t;
+
+  not: UnOp.t t;
+
+  isFalse: UnPr.t t;
+  isTrue: UnPr.t t;
+
+  ...BITWISE t;
+  ...BOUNDED t;
+  ...EQUALITY t;
+  ...INTABLE t;
+  ...ORDERED t;
+  ;;...SCANNABLE t;
+  ...TEXTABLE t;
+};

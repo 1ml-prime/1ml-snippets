@@ -1,0 +1,18 @@
+type ORDERED t = {
+  (<): BinPr.t t;
+};
+
+type ORDERED'0 = {
+  ...T'0;
+  ...ORDERED t;
+
+  (>): BinPr.t t;
+
+  (<=): BinPr.t t;
+  (>=): BinPr.t t;
+
+  max: BinOp.t t;
+  min: BinOp.t t;
+
+  inRange: Bounds.t t => UnPr.t t;
+};
