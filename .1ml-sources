@@ -33,3 +33,5 @@ src/basis/detail/generic/iso.1ml
 
 src/basis/public/data/bool.1ml
 src/basis/detail/data/bool.1ml
+src/basis/public/data/list.1ml
+src/basis/detail/data/list.1ml

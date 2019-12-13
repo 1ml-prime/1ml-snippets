@@ -1,0 +1,45 @@
+List :> LIST = {
+
+  ;; The 1ML prelude defines a Church encoded list type.  This redefines list as
+  ;; a recursive type.  A distinct advantage of using a recursive type is that
+  ;; operations on lists, like `head`, have their expected time complexities.
+
+  type w x xs = wrap 'o => {nil: () -> o; (::): x -> xs -> o} -> o;
+  type t x = rec xs => w x xs;
+
+  nil = @(t _) (wrap (fun {nil} => nil ()): w _ _);
+  (::) x xs = @(t _) (wrap (fun {(::)} => x :: xs): w _ _);
+
+  case xs cs = (unwrap xs.@(t _): w _ _) cs;
+
+  isNil xs = case xs {nil () = true; (::) _ _ = false};
+
+  head xs = case xs {nil () = none; (::) x _ = some x};
+  tail xs = case xs {nil () = none; (::) _ xs = some xs};
+
+  foldr (::) nil = rec loop => fun xs => case xs {
+    nil () = nil;
+    (::) x xs = x :: loop xs};
+
+  foldl xss = rec (loop: _ => _) => fun s xs => case xs {
+    nil () = s;
+    (::) x xs = loop (xss x s) xs};
+
+  length = foldl (const 1 >> (+)) 0;
+
+  nth = rec (loop: _ => _) => fun n xs => case xs {
+    nil () = none;
+    (::) x xs = if n == 0 then some x else loop (n-1) xs};
+
+  revPrependTo = foldl (::);
+  rev = revPrependTo nil;
+  cat hs ts = revPrependTo ts (rev hs);
+
+  map xy = foldl (xy >> (::)) nil >> rev;
+
+  filter p = foldl (fun x ys => if p x then x :: ys else ys) nil >> rev;
+
+  flatMap xys = foldl (fun x ys => revPrependTo ys (xys x)) nil >> rev;
+
+  toText toText = rev >> foldl (fun x s => toText x ++ " :: " ++ s) "nil";
+};

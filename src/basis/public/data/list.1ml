@@ -1,0 +1,32 @@
+type LIST = {
+  type t x;
+
+  nil 'x: t x;
+  (::) 'x: x => t x => t x;
+
+  case 'x 'o: t x => {nil: () -> o; (::): x -> t x -> o} -> o;
+
+  isNil 'x: t x -> Bool.t;
+
+  head 'x: t x -> Opt.t x;
+  tail 'x: t x -> Opt.t (t x);
+
+  foldr 'x 's: (x -> s -> s) => s => t x -> s;
+  foldl 'x 's: (x -> s -> s) => s => t x -> s;
+
+  length 'x: t x -> Int.t;
+
+  cat 'x: BinOp.t (t x);
+
+  rev 'x: UnOp.t (t x);
+
+  nth 'x: Int.t => t x -> Opt.t x;
+
+  map 'x 'y: (x -> y) => t x -> t y;
+
+  filter 'x: (x -> Bool.t) => UnOp.t (t x);
+
+  flatMap 'x 'y: (x -> t y) => t x -> t y;
+
+  toText 'x: (x -> Text.t) => t x -> Text.t;
+};
