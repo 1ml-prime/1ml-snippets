@@ -21,6 +21,7 @@ Zero :> {type t} = {type t = ()};
 Const = {type t v _ = v};
 Id = {type t v = v};
 Fork = {type t (type l a) (type r a) a = (l a, r a)};
+Compose = {type t (type f a) (type g a) t = f (g t)};
 
 ;;
 
