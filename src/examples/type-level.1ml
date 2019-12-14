@@ -1,0 +1,74 @@
+;; 1ML basically gives you simply typed lambda calculus (STLC) at the type
+;; level, which is unsurprising as 1ML is just as powerful as Fω.  You can even
+;; use lambda and let -expressions at the type level (note the `fst` and `snd`
+;; definitions below).  So, you can encode various kinds of stuff at the type
+;; level.  Of course, STLC is quite restrictive.
+
+TypeLevel = let type T = type in {
+  Pair = {
+    type t = (T => T => T) => T;
+
+    type fst (p: t) = p (fun (fst: T) (_: T) => fst);
+    type snd (p: t) = p (fun (_: T) (snd: T) => snd);
+
+    type of fst snd (d: T => T => T) = d fst snd;
+
+    type cross (f: T => T) (s: T => T) (p: t) (d: T => T => T) =
+      of (f (fst p)) (s (snd p)) d;
+
+    type map (f: T => T) (p: t) (d: T => T => T) = cross f f p d;
+  };
+
+  Bool = {
+    type t = T => T => T;
+
+    type true  true     _ = true;
+    type false    _ false = false;
+
+    type not (x: t) true false = x false true;
+
+    type andAlso (l: t) (r: t) false true = l (r true false) false;
+    type orElse (l: t) (r: t) false true = l true (r true false);
+
+    type equals (l: t) (r: t) true false = l (r true false) (r false true);
+  };
+
+  Alt = {
+    type t = (T => T) => (T => T) => T;
+
+    type inL v (inL: T => T)   (_: T => T) = inL v;
+    type inR v   (_: T => T) (inR: T => T) = inR v;
+
+    type isL (a: t) true false = a (Const.t true) (Const.t false);
+    type isR (a: t) true false = a (Const.t false) (Const.t true);
+
+    type case (a: t) (inL: T => T) (inR: T => T) = a inL inR;
+  };
+
+  Nat = {
+    type t = (T => T) => T => T;
+
+    type isZero (n: t) true false = n (Const.t false) true;
+
+    type  zero    (_: T => T) zero = zero;
+    type   one (succ: T => T) zero = succ zero;
+
+    type  succ        (n: t) (succ: T => T) zero = succ (n succ zero);
+    type  plus (m: t) (n: t) (succ: T => T) zero = n succ (m succ zero);
+    type times (m: t) (n: t) (succ: T => T) zero = n (m succ) zero;
+  };
+
+  List = {
+    type t = T => (T => T => T) => T;
+
+    type nil            nil ((::): T => T => T) = nil;
+    type (::) x (xs: t) nil ((::): T => T => T) = x :: xs nil (::);
+
+    type map (fn: T => T) (xs: t) nil ((::): T => T => T) =
+      xs nil (fun (x: T) => (::) (fn x));
+
+    type isNil (xs: t) true false = xs true (fun (_: T) (_: T) => false);
+
+    type head (xs: t) = xs Zero.t (fun (h: T) (_: T) => h);
+  };
+};
