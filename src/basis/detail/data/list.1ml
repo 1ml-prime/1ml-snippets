@@ -17,10 +17,6 @@ List :> LIST = {
   head = case {nil () = none; (::) x _ = some x};
   tail = case {nil () = none; (::) _ xs = some xs};
 
-  foldr (::) nil = rec loop => case {
-    nil () = nil;
-    (::) x xs = x :: loop xs};
-
   foldl xss = rec (loop: _ => _) => fun s => case {
     nil () = s;
     (::) x xs = loop (xss x s) xs};
@@ -37,6 +33,8 @@ List :> LIST = {
 
   traverse 'x 'y (F: APPLICATIVE'1) (xFy: x -> F.t y) xs = let ...F in
     pure rev <*> foldl (fun x xs => pure (::) <*> xFy x <*> xs) (F.pure nil) xs;
+
+  foldr (::) nil = rev >> foldl (::) nil;
 
   map xy = foldl (xy >> (::)) nil >> rev;
 
