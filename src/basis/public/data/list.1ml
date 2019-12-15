@@ -4,7 +4,7 @@ type LIST = {
   nil 'x: t x;
   (::) 'x: x => t x => t x;
 
-  case 'x 'o: t x => {nil: () -> o; (::): x -> t x -> o} -> o;
+  case 'x 'o: {nil: () -> o; (::): x -> t x -> o} => t x -> o;
 
   isNil 'x: t x -> Bool.t;
 

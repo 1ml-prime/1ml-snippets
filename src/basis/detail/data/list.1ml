@@ -10,24 +10,24 @@ List :> LIST = {
   nil = @(t _) (wrap (fun {nil} => nil ()): w _ _);
   (::) x xs = @(t _) (wrap (fun {(::)} => x :: xs): w _ _);
 
-  case xs cs = (unwrap xs.@(t _): w _ _) cs;
+  case cs xs = (unwrap xs.@(t _): w _ _) cs;
 
-  isNil xs = case xs {nil () = true; (::) _ _ = false};
+  isNil = case {nil () = true; (::) _ _ = false};
 
-  head xs = case xs {nil () = none; (::) x _ = some x};
-  tail xs = case xs {nil () = none; (::) _ xs = some xs};
+  head = case {nil () = none; (::) x _ = some x};
+  tail = case {nil () = none; (::) _ xs = some xs};
 
-  foldr (::) nil = rec loop => fun xs => case xs {
+  foldr (::) nil = rec loop => case {
     nil () = nil;
     (::) x xs = x :: loop xs};
 
-  foldl xss = rec (loop: _ => _) => fun s xs => case xs {
+  foldl xss = rec (loop: _ => _) => fun s => case {
     nil () = s;
     (::) x xs = loop (xss x s) xs};
 
   length = foldl (const 1 >> (+)) 0;
 
-  nth = rec (loop: _ => _) => fun n xs => case xs {
+  nth = rec (loop: _ => _) => fun n => case {
     nil () = none;
     (::) x xs = if n == 0 then some x else loop (n-1) xs};
 
