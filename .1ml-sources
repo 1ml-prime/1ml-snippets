@@ -2,6 +2,7 @@ src/basis/detail/bootstrap.1ml
 
 src/basis/public/type/t.1ml
 
+src/basis/public/concept/applicative.1ml
 src/basis/public/concept/bitwise.1ml
 src/basis/public/concept/bounded.1ml
 src/basis/public/concept/cased.1ml

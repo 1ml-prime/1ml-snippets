@@ -1,0 +1,6 @@
+type APPLICATIVE (t: t'1) = {
+  pure 'x: x -> t x;
+  (<*>) 'x 'y: t (type x -> y) => t x -> t y;
+};
+
+type APPLICATIVE'1 = {...T'1; ...APPLICATIVE t};

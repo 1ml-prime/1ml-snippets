@@ -14,6 +14,8 @@ type LIST = {
   foldr 'x 's: (x -> s -> s) => s => t x -> s;
   foldl 'x 's: (x -> s -> s) => s => t x -> s;
 
+  traverse 'x 'y: (F: APPLICATIVE'1) => (x -> F.t y) => t x -> F.t (t y);
+
   length 'x: t x -> Int.t;
 
   cat 'x: BinOp.t (t x);

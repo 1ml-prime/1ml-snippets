@@ -35,6 +35,9 @@ List :> LIST = {
   rev = revPrependTo nil;
   cat hs ts = revPrependTo ts (rev hs);
 
+  traverse 'x 'y (F: APPLICATIVE'1) (xFy: x -> F.t y) xs = let ...F in
+    pure rev <*> foldl (fun x xs => pure (::) <*> xFy x <*> xs) (F.pure nil) xs;
+
   map xy = foldl (xy >> (::)) nil >> rev;
 
   filter p = foldl (fun x ys => if p x then x :: ys else ys) nil >> rev;
