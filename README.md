@@ -1,4 +1,4 @@
-# 1ML snippets [![Gitter](https://badges.gitter.im/1ml-prime/community.svg)](https://gitter.im/1ml-prime/community)
+# 1ML snippets [![Gitter](https://badges.gitter.im/1ml-prime/community.svg)](https://gitter.im/1ml-prime/community) [![Build Status](https://travis-ci.org/1ml-prime/1ml-snippets.svg?branch=master)](https://travis-ci.org/1ml-prime/1ml-snippets)
 
 Experiments at programming in [1ML](https://people.mpi-sws.org/~rossberg/1ml/).
 
