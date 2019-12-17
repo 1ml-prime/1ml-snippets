@@ -1,4 +1,8 @@
+Alt = {...Alt; t = alt};
+Fun = {...Fun; type t a b = a -> b};
 Opt = {...Opt; t = opt};
+Unit = {type t = ()};
+Pair = {type t a b = (a, b)};
 
 Sq = {type t a = (a, a)};
 
