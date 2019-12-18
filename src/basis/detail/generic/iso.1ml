@@ -1,6 +1,8 @@
 Iso: ISO = {
   ...Iso;
 
+  inverse (ab: t _ _) = {from = ab.to; to = ab.from};
+
   to = (.to);
   from = (.from);
 

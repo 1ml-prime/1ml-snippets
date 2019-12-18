@@ -29,6 +29,8 @@ src/basis/public/debug/contract.1ml
 
 src/basis/detail/fun/reader.1ml
 
+src/basis/public/generic/equivalence.1ml
+
 src/basis/public/generic/iso.1ml
 src/basis/detail/generic/iso.1ml
 

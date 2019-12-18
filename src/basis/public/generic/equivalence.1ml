@@ -1,0 +1,10 @@
+type EQUIVALENCE = {
+  type t a b;
+
+  ...CATEGORY t;
+
+  inverse 'a 'b: t a b -> t b a;
+
+  to   'a 'b: t a b => a -> b;
+  from 'a 'b: t a b => b -> a;
+};

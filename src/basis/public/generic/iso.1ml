@@ -1,8 +1,1 @@
-type ISO = {
-  type t a b = {to: a -> b; from: b -> a};
-
-  ...CATEGORY t;
-
-  to   'a 'b: t a b => a -> b;
-  from 'a 'b: t a b => b -> a;
-};
+type ISO = EQUIVALENCE with (type t a b = {to: a -> b; from: b -> a});
