@@ -1,1 +1,1 @@
-type ISO = EQUIVALENCE with (type t a b = {to: a -> b; from: b -> a});
+type ISO = EQUIV with (type t a b = {to: a -> b; from: b -> a});

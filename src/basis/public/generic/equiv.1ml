@@ -1,4 +1,4 @@
-type EQUIVALENCE = {
+type EQUIV = {
   type t a b;
 
   ...CATEGORY t;

@@ -16,7 +16,7 @@ matrix:
             - ocaml
 
 git:
-  depth: 1
+  depth: 5
   submodules: false
 
 before_install:
