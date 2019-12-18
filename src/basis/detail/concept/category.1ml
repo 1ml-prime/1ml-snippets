@@ -1,5 +1,5 @@
 Category = {
-  fromCore (t: t'2) (Core: CATEGORY t) : CATEGORY'2 = {
+  fromCore (t: t'2) (Core: CATEGORY t) : CATEGORY_EXTRA'2 = {
     t = t;
     ...Core;
     (>>) = flip (<<);

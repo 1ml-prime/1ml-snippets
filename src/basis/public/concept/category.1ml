@@ -3,8 +3,9 @@ type CATEGORY (t: t'2) = {
   id 'a: t a a;
 };
 
-type CATEGORY'2 = {
-  ...T'2;
-  ...CATEGORY t;
+type CATEGORY'2 = {...T'2; ...CATEGORY t};
+
+type CATEGORY_EXTRA'2 = {
+  ...CATEGORY'2;
   (>>) 'a 'b 'c: t a b => t b c -> t a c;
 };
