@@ -2,7 +2,4 @@ type FUNCTOR (t: t'1) = {
   map 'a 'b: (a -> b) => t a -> t b;
 };
 
-type FUNCTOR'1 = {
-  ...T'1;
-  ...FUNCTOR t;
-};
+type FUNCTOR'1 = {...T'1; ...FUNCTOR t};

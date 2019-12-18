@@ -3,7 +3,4 @@ type MONAD (t: t'1) = {
   (>>=) 'a 'b: t a => (a -> t b) -> t b;
 };
 
-type MONAD'1 = {
-  ...T'1;
-  ...MONAD t;
-};
+type MONAD'1 = {...T'1; ...MONAD t};
