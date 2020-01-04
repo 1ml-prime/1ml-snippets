@@ -1,14 +1,22 @@
-;; Leibniz equivalence
-Equiv :> EQUIV = {
-  type T a b = (type p x) -> p a -> p b;
-  type t a b = wrap T a b;
-  wr (eq: T _ _) = wrap eq: t _ _;
+Equiv: {
+  ...EQUIV;
+  arg 'a 'b: (type f _) => t a b => t (f a) (f b);
+  rewrite 'a 'b 'c (type f _): t a b => t c (f a) => t c (f b);
+} = {
+  ...Equiv;
+  wr 'a 'b (eq: (type p _) -> p a -> p b) = wrap eq: t _ _;
   un eq = unwrap eq: t _ _;
   (<<) 'a 'b 'c (bc: t b c) (ab: t a b) =
-    wr (fun (type p x) => un bc p << un ab p);
-  id = wr (fun (type p x) => Fun.id);
+    wr (fun (type p _) => un bc p << un ab p);
+  id = wr (fun (type p _) => Fun.id);
   to eq a = un eq Id.t a;
   from 'a 'b (eq: t a b) b = un eq (fun (type b) => type b -> a) Fun.id b;
   inverse 'a 'b (eq: t a b) : t b a =
-    wr (fun (type p x) => un eq (fun (type b) => type p b -> p a) Fun.id)
+    wr (fun (type p _) => un eq (fun (type b) => type p b -> p a) Fun.id);
+  arg 'a 'b (type f _) (eq: t a b) =
+    wr (fun (type p _) => un eq (Compose.t p f));
+  rewrite 'a 'b 'c (type f _) (ab: t a b) (cfa: t c (f a)) = arg f ab << cfa;
+
+
+;;  type t = wrap (type t) => Alt.t t t;
 };

@@ -1,6 +1,6 @@
 Ordered = {
   fromCore 't (Core: ORDERED t) : ORDERED'0 = {
-    t = t;
+    t;
 
     ...Core;
 
@@ -15,5 +15,5 @@ Ordered = {
     inRange (r: Bounds.t _) x = not ((x < r.min) or (r.max < x));
   };
 
-  fromLess ((<): BinPr.t _) = fromCore {(<) = (<)};
+  fromLess ((<): BinPr.t _) = fromCore {(<)};
 };

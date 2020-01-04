@@ -1,0 +1,79 @@
+
+N :> {
+  type Z;
+  type S _;
+} = {
+  type Z   = Zero.t;
+  type S _ = Zero.t;
+};
+
+Nat = data case t _ :> {
+  Zero    :        case N.Z;
+  Succ 'n : t n => case (N.S n);
+};
+
+Nat = let
+  ...N;
+  type IMPURE (type p _) (type t _) = {
+    Zero    :        p Z;
+    Succ 'n : t n -> p (S n);
+  };
+  type T n (type t _) = (type p _) => IMPURE p t -> p n;
+in {
+  t = rec (type t _) => fun (type n) => type wrap T n t;
+
+  case 'n (p: {type t _}) (cs: IMPURE p.t t) e =
+    (unwrap e.@(t _): wrap T n t) p.t cs;
+
+  mk 'n (fn: T n t) = @(t n) (wrap fn: wrap T n t);
+  Zero = mk (fun (type p _) (r: IMPURE p t) => r.Zero);
+  Succ 'n (tn: t n) = mk (fun (type p _) (r: IMPURE p t) => r.Succ tn);
+} :> {
+  type t _;
+
+  case 'n: (p: {type t _}) => IMPURE p.t t => t n -> p.t n;
+
+  Zero    :        t Z;
+  Succ 'n : t n => t (S n);
+};
+
+ListN = data case t x _ :> {
+  nil     :               case (Nat.t N.Z);
+  (::) 'n : x => t x n -> case (Nat.t (N.S n));
+};
+
+ListN = let
+  type IMPURE (type x) (type p _ _) (type t _ _) = {
+    nil     :               p x (Nat.t N.Z);
+    (::) 'n : x -> t x n -> p x (Nat.t (N.S n));
+  };
+  type T x n (type t _ _) = (type p _ _) => IMPURE x p t -> p x n;
+in {
+  t = rec (type t _ _) => fun (type x) (type n) => type wrap T x n t;
+
+  case 'x 'n (p: {type t _ _}) (cs: IMPURE x p.t t) e =
+    (unwrap e.@(t _ _): wrap T x n t) p.t cs;
+
+  mk 'x 'n (fn: (type p _ _) => IMPURE x p t -> p x n) =
+    @(t x n) (wrap fn: wrap T x n t);
+
+  nil 'x = mk (fun (type p _ _) (r: IMPURE x p t) => r.nil);
+  (::) 'x 'n (v: x) (vs: t x n) =
+    mk (fun (type p _ _) (r: IMPURE x p t) => r.:: v vs);
+} :> {
+  type t _ _;
+
+  case 'x 'n: (p: {type t _ _}) => IMPURE x p.t t => t x n -> p.t x n;
+
+  nil  'x    :               t x (Nat.t N.Z);
+  (::) 'x 'n : x => t x n => t x (Nat.t (N.S n));
+};
+
+ListN = {
+  ...ListN;
+  map 'x 'y 'n (xy: x -> y) = rec (map: 'n => t x n -> t y n) =>
+    case {type t _ n = t y n} {
+      nil = nil;
+      (::) x xs = xy x :: map xs;
+    };
+};

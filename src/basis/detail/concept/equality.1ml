@@ -1,9 +1,9 @@
 Equality = {
   fromCore 't (Core: EQUALITY t) : EQUALITY'0 = {
-    t = t;
+    t;
     ...Core;
     (<>) l r = not (l == r);
   };
 
-  fromEquals ((==): BinPr.t _) = fromCore {(==) = (==)};
+  fromEquals ((==): BinPr.t _) = fromCore {(==)};
 };

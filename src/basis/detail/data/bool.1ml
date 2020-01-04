@@ -1,8 +1,8 @@
 Bool: BOOL = {
   ...Bool;
 
-  isFalse b = b == false;
-  isTrue b = b == true;
+  isFalse = (==) false;
+  isTrue = (==) true;
 
   ...{
       notb = not;
@@ -31,5 +31,5 @@ Bool: BOOL = {
         else none);
     } : TEXTABLE t;
 
-  ...{(==) = (==)} : EQUALITY t;
+  ...{(==)} : EQUALITY t;
 };

@@ -36,8 +36,9 @@ in {
 
 ...{
   Expr = {
-    type t a = wrap (on: EXPR) -> on.t a;
-    wr 'a (fn: (on: EXPR) -> on.t a) = wrap fn: t _;
+    type T a = (on: EXPR) -> on.t a;
+    type t a = wrap T a;
+    wr 'a (fn: T a) = wrap fn: t _;
     un e = unwrap e: t _;
     Val x = wr (fun (on: EXPR) => on.Val x);
     Un (fn: _ -> _) x = wr (fun (on: EXPR) => on.Un fn (un x on));

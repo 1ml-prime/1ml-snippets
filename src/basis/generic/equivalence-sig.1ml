@@ -1,0 +1,15 @@
+type EQUIVALENCE = {
+  type (<=>) _ _;
+
+  coerce 'x 'y: x <=> y => x -> y;
+
+  reflexivity 'x: x <=> x;
+  symmetry 'x 'y: x <=> y => y <=> x;
+  transitivity 'x 'y 'z: x <=> y => y <=> z => x <=> z;
+
+  apply1 'a 'b (type F _): a <=> b => F a <=> F b;
+  rewrite1 'x 'a 'b (type F _): a <=> b => x <=> F a => x <=> F b;
+
+  apply2 'a 'b 'c 'd (type F _ _): a <=> b => c <=> d => F a c <=> F b d;
+  rewrite2 'x 'a 'b 'c (type F _ _): a <=> b => x <=> F a c => x <=> F b c;
+};

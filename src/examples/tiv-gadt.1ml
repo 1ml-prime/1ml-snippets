@@ -1,0 +1,133 @@
+Rep = data case t _ :> {
+  bool : case Bool.t;
+  char : case Char.t;
+  int  : case Int.t;
+  text : case Text.t;
+  unit : case Unit.t;
+
+  alt   'x 'y : t x -> t y -> case (Alt.t x y);
+  (-->) 'x 'y : t x -> t y -> case (Fun.t x y);
+  pair  'x 'y : t x -> t y -> case (Pair.t x y);
+
+  iso 'x 'y : Iso.t x y -> t y -> case x;
+
+  lazy 'x: (() -> t x) -> case x;
+};
+
+Rep = let
+  type I (type t _) (type case _) = {
+    bool : case Bool.t;
+    char : case Char.t;
+    int  : case Int.t;
+    text : case Text.t;
+    unit : case Unit.t;
+
+    alt   'x 'y : t x -> t y -> case (Alt.t x y);
+    (-->) 'x 'y : t x -> t y -> case (Fun.t x y);
+    pair  'x 'y : t x -> t y -> case (Pair.t x y);
+
+    iso 'x 'y : Iso.t x y -> t y -> case x;
+
+    lazy 'x : (() -> t x) -> case x;
+  };
+  type J (type t _) = {type case _; ...I t case};
+  type T (type t _) x = (c: J t) -> c.case x;
+  ...{
+    t = rec (type t _) => fun (type x) => type wrap T t x;
+    case 'x (type case _) (cs: I t case) (e: t x) =
+      (unwrap e.@(t x): wrap T t x) {case; ...cs};
+    mk 'x (fn: T t x) = @(t x) (wrap fn: wrap T t x);
+  } :> {
+    type t _;
+    case 'x: (type case _) => I t case => t x -> case x;
+    mk 'x: T t x => t x;
+  };
+  J = J t;
+in {
+  t; case;
+
+  bool = mk (fun (r: J) => r.bool);
+  char = mk (fun (r: J) => r.char);
+  int  = mk (fun (r: J) => r.int);
+  text = mk (fun (r: J) => r.text);
+  unit = mk (fun (r: J) => r.unit);
+
+  alt   'x 'y (a: t x) (b: t y) = mk (fun (r: J) => r.alt  a b);
+  (-->) 'x 'y (a: t x) (b: t y) = mk (fun (r: J) => r.-->  a b);
+  pair  'x 'y (a: t x) (b: t y) = mk (fun (r: J) => r.pair a b);
+
+  iso 'x 'y (ab: Iso.t x y) (b: t y) = mk (fun (r: J) => r.iso ab b);
+
+  lazy 'x (th: () -> t x) = mk (fun (r: J) => r.lazy th);
+};
+
+Rep = {
+  ...Rep;
+
+  typeOf 'x (_: t x) = type x;
+
+  defaults (type t _) (default: 'a => t a) = {
+    bool = default;
+    char = default;
+    int  = default;
+    unit = default;
+    text = default;
+
+    alt   _ _ = default;
+    (-->) _ _ = default;
+    pair  _ _ = default;
+
+    iso _ _ = default;
+
+    lazy _ = default;
+  };
+
+  local
+    i = {to x = caseopt x (fun () => left ()) right;
+         from x = casealt x (fun () => none) some}
+  in
+    opt 'x (a: t x): t (opt x) = iso i (alt unit a);
+  end;
+
+  local
+    i = {to = List.case {nil = left; (::) x xs = right (x, xs)};
+         from x = casealt x (fun () => List.nil) (fun (x, xs) => List.:: x xs)}
+  in
+    list 'x (v: t x): t (List.t x) = rec vs =>
+      lazy (fun () => iso i (alt unit (pair v vs)));
+  end;
+};
+
+ToText = {type t x = x -> Text.t};
+
+toText = rec (toText: 'x => Rep.t x -> ToText.t x) => Rep.case ToText.t {
+  ...Rep.defaults ToText.t (fun _ => "<unimplemented>");
+
+  bool b = if b then "true" else "false";
+  unit () = "()";
+  text t = "\"" ++ t ++ "\"";
+
+  alt aT bT ab =
+    casealt ab
+      (fun a => "(left " ++ toText aT a ++ ")")
+      (fun b => "(right " ++ toText bT b ++ ")");
+
+  pair aT bT (a, b) = "(" ++ toText aT a ++ ", " ++ toText bT b ++ ")";
+
+  iso (ab: Iso.t _ _) bT a = toText bT (ab.to a);
+
+  lazy (th: () -> Rep.t _) x = toText (th ()) x;
+};
+
+println rep x = print (toText rep x ++ "\n");
+
+local
+  ...List;
+  ...Rep;
+in
+  do println (int) 101;
+  do println (pair bool text) (true, "that");
+  do println (opt bool) (some false);
+  do println (iso {to i = i <> 0; from b = if b then 1 else 0} bool) 1;
+  do println (list text) ("3" :: ("1" :: ("4" :: nil)));
+end;

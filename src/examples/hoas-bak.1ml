@@ -1,0 +1,78 @@
+(;
+
+gadt Expr: type => type =
+  | Val 'x       :                                 x => Expr x
+  | Bin 'x 'y 'z : (x -> y -> z) => Expr x => Expr y => Expr y
+  | If  'x       :   Expr Bool.t => Expr x => Expr x => Expr x
+  | App 'x 'y    :           Expr (x -> y) => Expr x => Expr y
+  | Lam 'x 'y    :                (Expr x -> Expr y) => Expr (x -> y)
+  | Fix 'x 'y    :         Expr ((x -> y) -> x -> y) => Expr (x -> y)
+  ;
+
+;)
+
+Expr = let
+  type EXPR (type p _) (type t _) = {
+    Val 'x       : x                           -> p x;
+    Bin 'x 'y 'z : (x -> y -> z) => t x => t y -> p z;
+    If  'x       : t Bool.t => t x => t x      -> p x;
+    App 'x 'y    : t (type x -> y) => t x      -> p y;
+    Lam 'x 'y    : (t x -> t y)                -> p (type x -> y);
+    Fix 'x 'y    : t (type (x -> y) -> x -> y) -> p (type x -> y);
+  };
+in {
+  t = rec (type t _) => fun (type a) => type wrap (type p _) => EXPR p t -> p a;
+
+  make 'x (fn: (type p _) => EXPR p t -> p x) =
+    @(t _) (wrap fn: wrap (type p _) => EXPR p t -> p x);
+
+  Val v = make (fun (type p _) (e: EXPR p t) => e.Val v);
+
+  Bin (f: _ -> _ -> _) (l: t _) (r: t _) =
+    make (fun (type p _) (e: EXPR p t) => e.Bin f l r);
+
+  If (b: t _) (c: t _) (a: t _) =
+    make (fun (type p _) (e: EXPR p t) => e.If b c a);
+
+  App (f: t (type _ -> _)) (a: t _) =
+    make (fun (type p _) (e: EXPR p t) => e.App f a);
+
+  Lam (f: t _ -> t _) = make (fun (type p _) (e: EXPR p t) => e.Lam f);
+
+  Fix (f: t (type (_ -> _) -> _ -> _)) =
+    make (fun (type p _) (e: EXPR p t) => e.Fix f);
+
+  type CASES = {type p _; ...EXPR p t};
+
+  case 'x (cs: CASES) e =
+    (unwrap e.@(t _): wrap (type p _) => EXPR p t -> p x) cs.p cs;
+} :> {
+  type t _;
+  ...EXPR t t;
+  type CASES = {type p _; ...EXPR p t};
+  case 'x: (cs: CASES) => t x -> cs.p x;
+};
+
+local
+  ...Expr;
+  (==) = Bin (==);
+  (*) = Bin (*);
+  (-) = Bin (-);
+in
+  Fact = Fix (Lam (fun f => Lam (fun x =>
+                If (x == Val 0)
+                   (Val 1)
+                   (x * App f (x - Val 1)))));
+
+  eval = rec (eval: 'x => t x -> x) => case {
+    type p x = x;
+    Val x = x;
+    Bin f x y = f (eval x) (eval y);
+    If b c a = eval (if eval b then c else a);
+    App f x = eval f (eval x);
+    Lam f x = eval (f (Expr.Val x));
+    Fix f = let f = eval f in rec f' => fun x => f f' x;
+  };
+
+  do Int.print (eval (App Fact (Val 5)));
+end;

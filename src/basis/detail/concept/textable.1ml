@@ -1,6 +1,6 @@
 Textable = {
   fromCore 't (Core : TEXTABLE t) : TEXTABLE'0 = {
-    t = t;
+    t;
     ...Core;
     embText = {to = toText; from = fromText};
   };

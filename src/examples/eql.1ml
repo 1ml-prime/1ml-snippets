@@ -1,0 +1,43 @@
+Eql = data case t _ _ :> {
+  reflexivity 'a: case a a;
+};
+
+Eql = let
+  type PURE (type p _ _) = {
+    reflexivity 'a: p a a;
+  };
+in {
+  type (<=>) a b = wrap (type p _ _) => PURE p -> p a b;
+  reflexivity = wrap (fun (type p _ _) (r: PURE p) => r.reflexivity): _ <=> _;
+  case 'a 'b (p: {type t _ _}) (cs: PURE p.t) (e: a <=> b) =
+    (unwrap e: _ <=> _) p.t cs;
+} :> {
+  type (<=>) a b;
+  ...PURE (<=>);
+  case 'a 'b: (p: {type t _ _}) => PURE p.t => a <=> b -> p.t a b;
+};
+
+Eql = {
+  ...Eql;
+  ...{
+    symmetry = case {type t a b = b <=> a} {reflexivity};
+
+    apply1 (type F _) = case {type t a b = F a <=> F b} {reflexivity};
+
+    rewrite1 'x 'a 'b (type F _) =
+      case {type t a b = x <=> F a -> x <=> F b} {reflexivity = id};
+
+    transitivity 'c =
+      case {type t a b = b <=> c -> a <=> c} {reflexivity = id};
+
+    coerce = case {type t a b = a -> b} {reflexivity = id};
+  } :> {
+    coerce 'a 'b: a <=> b -> a -> b;
+
+    symmetry 'a 'b: a <=> b -> b <=> a;
+    transitivity 'a 'b 'c: a <=> b -> b <=> c -> a <=> c;
+
+    apply1 'a 'b: (type F _) => a <=> b -> F a <=> F b;
+    rewrite1 'x 'a 'b (type F _): a <=> b -> x <=> F a -> x <=> F b;
+  };
+};

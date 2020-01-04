@@ -1,40 +1,61 @@
 At = {type t a = Int.t -> a};
 
-type PUSH (type con a) (type cov a) = {
-  generate 'a: Int.t => At.t a   -> cov a;
-  append   'a: con a => con a    -> cov a;
-  map   'a 'b: (a -> b) => con a -> cov b;
-  reverse  'a: con a             -> cov a;
+PushPull = data case t _ :> {
+  generate 'x: Int.t -> At.t x -> case x;
+  append   'x:      t x -> t x -> case x;
+  map   'y 'x: (x -> y) -> t x -> case y;
+  reverse  'x:             t x -> case x;
 };
 
-type PUSH'1 = {
-  type t a;
-  ...PUSH t t;
+PushPull = let
+  type I (type case _) (type t _) = {
+    generate 'x: Int.t -> At.t x -> case x;
+    append   'x: t x -> t x      -> case x;
+    map   'y 'x: (x -> y) -> t x -> case y;
+    reverse  'x: t x             -> case x;
+  };
+  type J (type t _) = {type case _; ...I case t};
+  type T x (type t _) = (c: J t) -> c.case x;
+  ...{
+    t = rec (type t _) => fun (type x) => type wrap T x t;
+    case 'x (type case _) (c: I case t) e =
+      (unwrap e.@(t _): wrap T x t) {case; ...c};
+    mk 'x (fn: T x t) = @(t _) (wrap fn: wrap T x t);
+  } :> {
+    type t _;
+    case 'x: (type case _) => I case t => t x -> case x;
+    mk 'x: T x t => t x;
+  };
+  type J = J t;
+in {
+  t; case;
+  generate 'x (n: Int.t) (f: At.t x) = mk (fun (r: J) => r.generate n f);
+  append   'x    (ls: t x) (rs: t x) = mk (fun (r: J) => r.append ls rs);
+  map   'y 'x  (f: x -> y) (xs: t x) = mk (fun (r: J) => r.map f xs);
+  reverse  'x              (xs: t x) = mk (fun (r: J) => r.reverse xs);
 };
 
-PushPull (Push: PUSH'1)
-         (fold: 'a =>
-                (type t a) =>
-                (on: PUSH (Fork.t Push.t t) t) =>
-                Push.t a -> t a) = let ...Push in {
-  length 'a: Push.t a -> Int.t = fold (Const.t Int.t) {
+PushPull = {
+  ...PushPull;
+
+  length = rec (length: 'a => t a -> Int.t) => case (Const.t Int.t) {
     generate n _ = n;
-    append (_, nL) (_, nR) = nL + nR;
-    map _ (_, n) = n;
-    reverse (_, n) = n;
+    append ls rs = length ls + length rs;
+    map _ xs = length xs;
+    reverse xs = length xs;
   };
 
-  at 'a: Push.t a -> At.t a = fold At.t {
+  at = rec (at: 'a => t a -> At.t a) => case At.t {
     generate n at = at;
-    append (ls, lat) (_, rat) = let ln = length ls in
-      fun i => if i < ln then lat i else rat (i - ln);
-    map xy (_, xat) = fun i => xy (xat i);
-    reverse (xs, xat) = let xnm1 = length xs - 1 in
-      fun i => xat (xnm1 - i);
+    append ls rs = let ln = length ls in
+      fun i => if i < ln then at ls i else at rs (i - ln);
+    map xy xs = fun i => xy (at xs i);
+    reverse xs = let xnm1 = length xs - 1 in
+      fun i => at xs (xnm1 - i);
   };
 
   foo =
-    Push.generate 10 id
-    |> Push.map (fun x => (x, x))
-    |> Push.reverse;
+    generate 10 id
+    |> map (fun x => (x, x))
+    |> reverse;
 };

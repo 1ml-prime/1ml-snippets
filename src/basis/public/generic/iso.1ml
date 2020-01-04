@@ -1,1 +1,4 @@
-type ISO = EQUIV with (type t a b = {to: a -> b; from: b -> a});
+type ISO = {
+  ...EQUIV;
+  iso 'a 'b: (a -> b) => (b -> a) -> t a b;
+};

@@ -1,3 +1,11 @@
+(;
+
+gadt List 'a: type = {
+  nil: List a;
+  (::): a => List a => List a;
+};
+
+;)
 List :> LIST = {
 
   ;; The 1ML prelude defines a Church encoded list type.  This redefines list as

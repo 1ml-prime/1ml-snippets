@@ -1,0 +1,27 @@
+Equivalence: EQUIVALENCE = {
+  (<=>) = (<=>);
+
+  wr 'a 'b (eq: (type P _) -> P a -> P b) = wrap eq: _ <=> _;
+  un eq = unwrap eq: _ <=> _;
+
+  coerce ab a = un ab Id.t a;
+
+  reflexivity = wr (fun (type P _) => id);
+  symmetry 'x 'y (x_y: x <=> y) =
+    wr (fun (type P _) => un x_y (fun (type y) => type P y -> P x) id);
+  transitivity 'x 'y 'z (x_y: x <=> y) (y_z: y <=> z) =
+    wr (fun (type P _) => un y_z P << un x_y P);
+
+  apply1 'a 'b (type F _) (a_b: a <=> b) =
+    wr (fun (type P _) =>
+      un a_b (fun (type x) => P (F x)));
+  rewrite1 'x 'a 'b (type F _) (a_b: a <=> b) (x_Fa: x <=> F a) =
+    transitivity x_Fa (apply1 F a_b);
+
+  apply2 'a 'b 'c 'd (type F _ _) (a_b: a <=> b) (c_d: c <=> d) =
+    wr (fun (type P _) =>
+      un a_b (fun (type x) => P (F x _)) <<
+      un c_d (fun (type x) => P (F _ x)));
+  rewrite2 'x 'a 'b 'c (type F _ _) (a_b: a <=> b) (x_Fac: x <=> F a c) =
+    transitivity x_Fac (apply2 F a_b reflexivity);
+};

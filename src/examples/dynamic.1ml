@@ -1,0 +1,36 @@
+type REP = {
+  type t a;
+
+  (~) 'a 'b: t a => t b -> Opt.t (a <=> b); 
+};
+
+Rep = {
+  type Unary a = wrap {
+    type F _;
+    type x;
+    eq: a <=> F x;
+  };
+  
+  (|) = Alt.t;
+  t (type a) = (a <=> Unit.t)
+             | (a <=> Bool.t)
+             | (a <=> Int.t)
+             | (a <=> Text.t)
+             | (a <=> Char.t)
+             | (type wrap (type x) => (type y) => a <=> Fun.t x y)
+  ;
+
+  
+};
+
+type DYNAMIC = {
+  type t;
+
+  toDynamic 'a: a
+};
+
+
+
+
+
+

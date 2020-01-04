@@ -1,6 +1,6 @@
 Category = {
-  fromCore (t: t'2) (Core: CATEGORY t) : CATEGORY_EXTRA'2 = {
-    t = t;
+  fromCore (type t _ _) (Core: CATEGORY t) : CATEGORY_EXTRA'2 = {
+    t;
     ...Core;
     (>>) = flip (<<);
   };
